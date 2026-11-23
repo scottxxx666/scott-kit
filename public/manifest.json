@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "scottkit",
+  "version": "0.1.0",
+  "description": "Scott's personal toolbox: small web capture helpers.",
+  "background": { "service_worker": "background.js" },
+  "permissions": ["activeTab", "scripting", "storage", "alarms"],
+  "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*"],
+  "options_page": "options.html",
+  "action": { "default_title": "scottkit" },
+  "commands": {
+    "video-timestamp": {
+      "suggested_key": { "default": "Alt+Shift+S", "mac": "Alt+Shift+S" },
+      "description": "記錄目前影片時間點"
+    }
+  }
+}

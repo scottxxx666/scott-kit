@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>scottkit 設定</title>
+    <style>
+      :root { color-scheme: light dark; --muted: #71717a; --line: #d4d4d8; }
+      @media (prefers-color-scheme: dark) { :root { --line: #3f3f46; } }
+      body { font: 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; max-width: 680px; margin: 32px auto; padding: 0 20px; }
+      h1 { font-size: 22px; margin: 0 0 4px; }
+      h2 { font-size: 15px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+      .sub { color: var(--muted); margin: 0 0 8px; }
+      label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 13px; }
+      .hint { color: var(--muted); font-size: 12px; font-weight: 400; }
+      input[type="text"], input[type="password"], select { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: transparent; color: inherit; }
+      button { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+      button.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+      .row { display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+      .status { font-size: 13px; }
+      .ok { color: #16a34a; } .err { color: #dc2626; }
+      code { font-size: 12px; }
+      ul { padding-left: 18px; margin: 6px 0; }
+      li { font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <h1>scottkit</h1>
+    <p class="sub">Scott 的個人小工具箱</p>
+
+    <h2>快捷鍵</h2>
+    <ul id="shortcuts"></ul>
+    <div class="row"><button id="edit-shortcuts">修改快捷鍵</button></div>
+
+    <h2>Logseq</h2>
+    <p class="sub">在 Logseq 開啟 設定 → 功能 → HTTP APIs server，從 🔌 選單啟動 server 並建立 token。</p>
+    <label>API URL</label>
+    <input type="text" data-path="logseq.apiUrl" />
+    <label>Token</label>
+    <input type="password" data-path="logseq.token" />
+    <label>其他內容的收件匣頁面 <span class="hint">（沒有專屬格式的功能會寫到這裡）</span></label>
+    <input type="text" data-path="logseq.inboxPage" />
+    <div class="row">
+      <button id="test">測試連線</button>
+      <span id="test-result" class="status"></span>
+    </div>
+
+    <h2>影片時間點</h2>
+    <label>寫入頁面</label>
+    <input type="text" data-path="videoTimestamp.page" />
+    <label>新影片放在</label>
+    <select data-path="videoTimestamp.newVideoPosition">
+      <option value="top">頁面最上面</option>
+      <option value="bottom">頁面最下面</option>
+    </select>
+    <label>影片區塊格式 <span class="hint">{title} {url}</span></label>
+    <input type="text" data-path="videoTimestamp.parentTemplate" />
+    <label>時間點格式 <span class="hint">{time} {note} {timeUrl} {seconds}</span></label>
+    <input type="text" data-path="videoTimestamp.childTemplate" />
+    <label>時間點格式（網站不支援跳轉時間，例如 Weverse）<span class="hint">{time} {note} {seconds}</span></label>
+    <input type="text" data-path="videoTimestamp.childTemplateNoLink" />
+
+    <div class="row">
+      <button id="save" class="primary">儲存設定</button>
+      <span id="save-result" class="status"></span>
+    </div>
+
+    <h2>待重送</h2>
+    <p class="sub" id="queue-summary">—</p>
+    <ul id="queue-items"></ul>
+    <div class="row">
+      <button id="retry">立即重送</button>
+      <button id="clear">清空</button>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

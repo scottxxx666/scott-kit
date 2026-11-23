@@ -1,0 +1,44 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+scottkit is a personal Manifest V3 Chrome extension (TypeScript, bundled with esbuild, no framework). Its features capture things from web pages and send them to "sinks" (currently only Logseq, via its local HTTP API at `127.0.0.1:12315`). The UI text and README are in Traditional Chinese. Keep user-facing strings in that language.
+
+## Commands
+
+```bash
+npm run build       # wipe dist/, bundle every entry as an IIFE, copy public/ into dist/
+npm run watch       # rebuild on change, with inline sourcemaps
+npm run typecheck   # tsc --noEmit (esbuild does not type-check)
+```
+
+There is no test framework or linter set up yet. To try a change, load `dist/` as an unpacked extension in `chrome://extensions`, and press reload on scottkit after each rebuild.
+
+## Architecture
+
+```
+feature content script ──Clip──▶ background (dispatch / queue) ──▶ sinks
+```
+
+- **Features are injected on demand, not declared as content scripts.** A keyboard command (`chrome.commands`) makes `src/background.ts` look up the feature in `src/features/registry.ts` and run `chrome.scripting.executeScript` with the built file. This relies on the `activeTab` permission, so the extension has no broad host permissions. Don't add `content_scripts` or `<all_urls>`.
+- Because the script runs again on every key press, each content script has to guard against running twice itself. `video-timestamp/content.ts` does this with a `window.__scottkit…Busy` flag.
+- **Clip** (`src/core/clip.ts`) is the only contract between features and sinks: `{ id, kind, url, title, createdAt, data }`. Features choose `kind` and `data`, and sinks choose how to store them.
+- **Messaging**: content scripts and the options page talk to the service worker only through the typed `Request` union in `src/core/messages.ts`, using the `send()` helper. To add a message, extend the union and the `switch` in `background.ts`.
+- **Queue** (`src/core/queue.ts`): `dispatch` sends a clip to every sink in `settings.enabledSinks`. Each failure becomes a `QueueItem` for that sink, stored in `chrome.storage.local`. A `chrome.alarms` alarm retries every minute, and the badge shows how many items are pending. Retrying stops a sink at its first failure so clips stay in order. All mutations go through the `exclusive()` promise lock. `refreshQueueState` re-syncs the badge and alarm when the service worker restarts.
+- **Sinks** implement `Sink` (`send` throws on failure, and `test` is used by the options page). `src/sinks/logseq/index.ts` sends each clip to a per-`kind` handler, or falls back to an inbox page if the kind has none. Feature-specific Logseq writing code lives with the feature (`features/video-timestamp/logseq.ts`), not in the sink.
+- **Settings** (`src/core/settings.ts`): kept in `chrome.storage.local` on purpose, not `sync`, so the Logseq token stays on this machine. Stored values are deep-merged over `DEFAULT_SETTINGS`, so new sections with defaults just work for existing installs. Arrays are replaced, not merged. The options page binds inputs through `data-path="a.b"` attributes in `public/options.html`.
+- **Overlay UI** (`src/ui/overlay.ts`) uses plain DOM rather than shadow DOM on purpose. Sites like YouTube only ignore their shortcuts when the event target is a real `<input>`. It also stops key events from propagating and skips Enter while an IME is composing.
+- **Video timestamp**: `adapters.ts` holds site-specific logic (YouTube, bilibili, and a generic fallback that must stay last). `logseq.ts` reuses any top-level block whose content contains `videoKey`, including blocks written by hand, and otherwise creates a new parent block.
+
+## Adding a feature
+
+You have to update four places, and they must use the same id:
+1. `src/features/<name>/content.ts`: build a clip with `newClip("<kind>", …)` and send `scottkit:clip`
+2. `src/features/registry.ts`: add an entry
+3. `public/manifest.json`: add a `commands` entry with the same id
+4. `build.mjs`: add an `entryPoints` entry (its output path must match `script` in the registry)
+5. Optional: add a handler for the kind in `src/sinks/logseq/index.ts`
+
+To add a new sink, implement `Sink`, register it in `src/sinks/index.ts`, and add its id to `enabledSinks`. If it calls a new local server, it also needs that server in `host_permissions`.
