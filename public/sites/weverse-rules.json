@@ -4,7 +4,7 @@
     "priority": 1,
     "action": { "type": "block" },
     "condition": {
-      "urlFilter": "||imasdk.googleapis.com/js/sdkloader/ima3.js",
+      "urlFilter": "||imasdk.googleapis.com^",
       "initiatorDomains": ["weverse.io"],
       "resourceTypes": ["script"]
     }

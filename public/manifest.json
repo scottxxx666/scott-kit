@@ -16,9 +16,6 @@
     "notifications"
   ],
   "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*", "https://api.pics.ee/*"],
-  "content_scripts": [
-    { "matches": ["https://weverse.io/*"], "css": ["sites/weverse.css"], "run_at": "document_start" }
-  ],
   "declarative_net_request": {
     "rule_resources": [{ "id": "weverse", "enabled": true, "path": "sites/weverse-rules.json" }]
   },
