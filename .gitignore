@@ -1,3 +1,20 @@
 node_modules/
 dist/
 .DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Extension packaging (*.pem is the signing key Chrome makes on "Pack extension")
+*.pem
+*.crx
+*.zip
+
+# Local / secrets
+.env*
+.claude/settings.local.json
+
+# Misc
+*.log
+*.tsbuildinfo

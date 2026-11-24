@@ -4,11 +4,14 @@
   "version": "0.1.0",
   "description": "Scott's personal toolbox: small web capture helpers.",
   "background": { "service_worker": "background.js" },
-  "permissions": ["activeTab", "scripting", "storage", "alarms"],
+  "permissions": ["activeTab", "scripting", "storage", "alarms", "declarativeNetRequest"],
   "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*"],
   "content_scripts": [
     { "matches": ["https://weverse.io/*"], "css": ["sites/weverse.css"], "run_at": "document_start" }
   ],
+  "declarative_net_request": {
+    "rule_resources": [{ "id": "weverse", "enabled": true, "path": "sites/weverse-rules.json" }]
+  },
   "options_page": "options.html",
   "action": { "default_title": "scottkit" },
   "commands": {
