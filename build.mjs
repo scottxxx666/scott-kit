@@ -8,6 +8,7 @@ const watch = process.argv.includes("--watch");
 const entryPoints = {
   background: "src/background.ts",
   options: "src/options/options.ts",
+  offscreen: "src/offscreen/offscreen.ts",
   // One injected script per feature. Add new features here.
   "features/video-timestamp": "src/features/video-timestamp/content.ts",
 };

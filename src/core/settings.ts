@@ -1,6 +1,6 @@
 /**
- * Settings live in chrome.storage.local (not sync: the Logseq token stays on
- * this machine). Each feature/sink owns its own section; add new sections here
+ * Settings live in chrome.storage.local (not sync: the Logseq and PicSee tokens stay
+ * on this machine). Each feature/sink owns its own section; add new sections here
  * with defaults and they are merged automatically for existing installs.
  */
 export interface Settings {
@@ -23,6 +23,9 @@ export interface Settings {
     /** Used when the site has no time-addressable URL (e.g. Weverse). */
     childTemplateNoLink: string;
   };
+  picsee: {
+    token: string;
+  };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -38,6 +41,9 @@ export const DEFAULT_SETTINGS: Settings = {
     parentTemplate: "[{title}]({url})",
     childTemplate: "[{time} {note}]({timeUrl})",
     childTemplateNoLink: "{time} {note}",
+  },
+  picsee: {
+    token: "",
   },
 };
 

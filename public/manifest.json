@@ -4,8 +4,18 @@
   "version": "0.1.0",
   "description": "Scott's personal toolbox: small web capture helpers.",
   "background": { "service_worker": "background.js" },
-  "permissions": ["activeTab", "scripting", "storage", "alarms", "declarativeNetRequest"],
-  "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "alarms",
+    "declarativeNetRequest",
+    "offscreen",
+    "clipboardRead",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*", "https://api.pics.ee/*"],
   "content_scripts": [
     { "matches": ["https://weverse.io/*"], "css": ["sites/weverse.css"], "run_at": "document_start" }
   ],
@@ -18,6 +28,10 @@
     "video-timestamp": {
       "suggested_key": { "default": "Alt+Shift+S", "mac": "Alt+Shift+S" },
       "description": "記錄目前影片時間點"
+    },
+    "shorten-url": {
+      "suggested_key": { "default": "Alt+X", "mac": "Alt+X" },
+      "description": "用 PicSee 縮短剪貼簿裡的網址"
     }
   }
 }

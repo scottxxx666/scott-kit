@@ -59,6 +59,11 @@
     <label>時間點格式（網站不支援跳轉時間，例如 Weverse）<span class="hint">{time} {note} {seconds}</span></label>
     <input type="text" data-path="videoTimestamp.childTemplateNoLink" />
 
+    <h2>PicSee 縮網址</h2>
+    <p class="sub">複製網址後按快捷鍵，剪貼簿會換成短網址。到 <a href="https://picsee.io/developers" target="_blank">PicSee 開發者頁面</a>（完成手機驗證）取得 API token，免費版一年 800 次。</p>
+    <label>API Token</label>
+    <input type="password" data-path="picsee.token" />
+
     <div class="row">
       <button id="save" class="primary">儲存設定</button>
       <span id="save-result" class="status"></span>

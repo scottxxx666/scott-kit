@@ -12,9 +12,10 @@ scottkit is a personal Manifest V3 Chrome extension (TypeScript, bundled with es
 npm run build       # wipe dist/, bundle every entry as an IIFE, copy public/ into dist/
 npm run watch       # rebuild on change, with inline sourcemaps
 npm run typecheck   # tsc --noEmit (esbuild does not type-check)
+npm test            # node:test over src/**/*.test.ts (Node 24 strips the types; no deps)
 ```
 
-There is no test framework or linter set up yet. To try a change, load `dist/` as an unpacked extension in `chrome://extensions`, and press reload on scottkit after each rebuild.
+Tests cover only code free of `chrome.*` (e.g. `features/shorten-url/picsee.ts`), and are excluded from `tsc` so Node types don't leak into extension code. There is no linter. To try a change, load `dist/` as an unpacked extension in `chrome://extensions`, and press reload on scottkit after each rebuild.
 
 ## Architecture
 
@@ -24,6 +25,7 @@ feature content script ──Clip──▶ background (dispatch / queue) ──�
 
 - **Features are injected on demand, not declared as content scripts.** A keyboard command (`chrome.commands`) makes `src/background.ts` look up the feature in `src/features/registry.ts` and run `chrome.scripting.executeScript` with the built file. This relies on the `activeTab` permission, so the extension has no broad host permissions. Don't add `<all_urls>`, and don't add `content_scripts` for capture features.
 - **Site fixes** are the one exception: CSS-only `content_scripts` scoped to a single site, in `public/sites/<site>.css`, plus optional static `declarativeNetRequest` block rules in `public/sites/<site>-rules.json` limited with `initiatorDomains`. Weverse uses both: `weverse-rules.json` blocks Google's IMA ad SDK (`ima3.js`) so video ads never load, and `weverse.css` hides `#ad-container` as a fallback. Keep them CSS-only/declarative and each to one site.
+- **Background features** (`run: "background"` in the registry) are the other kind: the command runs a function from `BACKGROUND_FEATURES` in `background.ts` instead of injecting a script. `shorten-url` uses this: it reads the clipboard through the offscreen document (`core/offscreen-clipboard.ts` + `offscreen/offscreen.ts`, using `execCommand` because an offscreen page never has focus), shortens it with PicSee (`api.pics.ee`), writes it back, and reports with `chrome.notifications`. It doesn't produce a Clip.
 - Because the script runs again on every key press, each content script has to guard against running twice itself. `video-timestamp/content.ts` does this with a `window.__scottkit…Busy` flag.
 - **Clip** (`src/core/clip.ts`) is the only contract between features and sinks: `{ id, kind, url, title, createdAt, data }`. Features choose `kind` and `data`, and sinks choose how to store them.
 - **Messaging**: content scripts and the options page talk to the service worker only through the typed `Request` union in `src/core/messages.ts`, using the `send()` helper. To add a message, extend the union and the `switch` in `background.ts`.
@@ -35,7 +37,7 @@ feature content script ──Clip──▶ background (dispatch / queue) ──�
 
 ## Adding a feature
 
-You have to update four places, and they must use the same id:
+You have to update four places, and they must use the same id (for a `run: "background"` feature, skip 1 and 4 and add the function to `BACKGROUND_FEATURES` instead):
 1. `src/features/<name>/content.ts`: build a clip with `newClip("<kind>", …)` and send `scottkit:clip`
 2. `src/features/registry.ts`: add an entry
 3. `public/manifest.json`: add a `commands` entry with the same id

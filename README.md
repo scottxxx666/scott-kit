@@ -7,6 +7,7 @@ Scott 的個人 Chrome 擴充功能工具箱，各種從網頁擷取東西的小
 | 功能 | 快捷鍵（預設） | 說明 |
 | --- | --- | --- |
 | 記錄影片時間點 | `⌥⇧S` / `Alt+Shift+S` | 暫停影片 → 輸入描述 → 寫進 Logseq 對應影片底下 |
+| 縮網址（PicSee） | `⌥X` / `Alt+X` | 複製長網址 → 按快捷鍵 → 剪貼簿換成短網址（任何分頁都能用） |
 
 影片時間點支援 YouTube（含 Shorts）、bilibili（可跳轉時間），以及 Weverse 和其他有 `<video>` 的網站（只記時間文字）。
 
@@ -24,12 +25,14 @@ Scott 的個人 Chrome 擴充功能工具箱，各種從網頁擷取東西的小
 ```bash
 npm install
 npm run build        # 或 npm run watch 邊改邊 build
+npm test             # 單元測試（Node 24+）
 ```
 
 1. Chrome 打開 `chrome://extensions`，開啟「開發人員模式」
 2. 「載入未封裝項目」→ 選 `dist/`
 3. Logseq：設定 → 功能 → 開啟 HTTP APIs server，從 🔌 選單 Start server，建立 Authorization token
 4. 點 scottkit 圖示開啟設定頁，貼上 token、按「測試連線」
+5. （縮網址）到 [PicSee 開發者頁面](https://picsee.io/developers) 完成手機驗證、取得 API token，貼到設定頁的「PicSee 縮網址」。免費版一年 800 次，每按一次用一次
 
 改完程式後要在 `chrome://extensions` 按 scottkit 的重新載入。
 

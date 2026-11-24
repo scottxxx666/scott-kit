@@ -2,11 +2,18 @@ import type { Request, TestResult } from "./core/messages";
 import { clearQueue, dispatch, processQueue, queueStatus, refreshQueueState, RETRY_ALARM } from "./core/queue";
 import { getSettings } from "./core/settings";
 import { FEATURES } from "./features/registry";
+import { shortenClipboardUrl } from "./features/shorten-url/background";
 import { SINKS } from "./sinks";
+
+const BACKGROUND_FEATURES: Record<string, () => Promise<void>> = {
+  "shorten-url": shortenClipboardUrl,
+};
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   const feature = FEATURES.find((f) => f.id === command);
-  if (!feature || tab?.id === undefined) return;
+  if (!feature) return;
+  if (feature.run === "background") return BACKGROUND_FEATURES[feature.id]?.();
+  if (tab?.id === undefined) return;
   try {
     await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: [feature.script] });
   } catch (e) {
