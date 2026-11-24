@@ -6,6 +6,9 @@
   "background": { "service_worker": "background.js" },
   "permissions": ["activeTab", "scripting", "storage", "alarms"],
   "host_permissions": ["http://127.0.0.1:12315/*", "http://localhost:12315/*"],
+  "content_scripts": [
+    { "matches": ["https://weverse.io/*"], "css": ["sites/weverse.css"], "run_at": "document_start" }
+  ],
   "options_page": "options.html",
   "action": { "default_title": "scottkit" },
   "commands": {

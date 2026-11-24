@@ -22,7 +22,8 @@ There is no test framework or linter set up yet. To try a change, load `dist/` a
 feature content script ──Clip──▶ background (dispatch / queue) ──▶ sinks
 ```
 
-- **Features are injected on demand, not declared as content scripts.** A keyboard command (`chrome.commands`) makes `src/background.ts` look up the feature in `src/features/registry.ts` and run `chrome.scripting.executeScript` with the built file. This relies on the `activeTab` permission, so the extension has no broad host permissions. Don't add `content_scripts` or `<all_urls>`.
+- **Features are injected on demand, not declared as content scripts.** A keyboard command (`chrome.commands`) makes `src/background.ts` look up the feature in `src/features/registry.ts` and run `chrome.scripting.executeScript` with the built file. This relies on the `activeTab` permission, so the extension has no broad host permissions. Don't add `<all_urls>`, and don't add `content_scripts` for capture features.
+- **Site fixes** are the one exception: CSS-only `content_scripts` scoped to a single site, in `public/sites/<site>.css` (e.g. `weverse.css` hides Weverse's `#ad-container`). Keep them CSS-only and each to one site's `matches`.
 - Because the script runs again on every key press, each content script has to guard against running twice itself. `video-timestamp/content.ts` does this with a `window.__scottkit…Busy` flag.
 - **Clip** (`src/core/clip.ts`) is the only contract between features and sinks: `{ id, kind, url, title, createdAt, data }`. Features choose `kind` and `data`, and sinks choose how to store them.
 - **Messaging**: content scripts and the options page talk to the service worker only through the typed `Request` union in `src/core/messages.ts`, using the `send()` helper. To add a message, extend the union and the `switch` in `background.ts`.

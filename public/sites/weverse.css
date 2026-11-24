@@ -1,0 +1,4 @@
+/* Weverse shows #ad-container by setting an inline display; !important overrides it. */
+#ad-container {
+  display: none !important;
+}
